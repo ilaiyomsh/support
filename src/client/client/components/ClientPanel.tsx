@@ -16,7 +16,7 @@ const METADATA_STORAGE_KEY = 'instance_metadata';
 
 interface StoredConfig {
   linkCode: string;
-  adminName: string;
+  // adminName: string;
   connectedAt: string;
   instanceMetadata?: InstanceMetadata;
 }
@@ -24,7 +24,7 @@ interface StoredConfig {
 export default function ClientPanel() {
   const [screen, setScreen] = useState<'setup' | 'support' | 'loading' | 'error'>('loading');
   const [linkCode, setLinkCode] = useState<string | null>(null);
-  const [adminName, setAdminName] = useState<string | null>(null);
+  // const [adminName, setAdminName] = useState<string | null>(null);
   const [instanceMetadata, setInstanceMetadata] = useState<InstanceMetadata | null>(null);
   const [currentUserMetadata, setCurrentUserMetadata] = useState<CurrentUserMetadata | null>(null);
   const [loadingError, setLoadingError] = useState<string | null>(null);
@@ -115,10 +115,10 @@ export default function ClientPanel() {
 
               const validateData = await validateResponse.json();
 
-              if (validateData.valid && validateData.adminName) {
+              if (validateData.valid /* && validateData.adminName */) {
                 // קוד תקין - מעבר ישירות ל-SupportScreen
                 setLinkCode(config.linkCode);
-                setAdminName(validateData.adminName);
+                // setAdminName(validateData.adminName);
                 setScreen('support');
                 return;
               }
@@ -157,7 +157,7 @@ export default function ClientPanel() {
     }
   }, [screen, instanceMetadata, currentUserMetadata]);
 
-  const handleConnected = async (code: string, admin: string) => {
+  const handleConnected = async (code: string, _admin?: string) => {
     // שמירת קוד ב-Monday Storage
     try {
       setLoadingError(null);
@@ -189,7 +189,7 @@ export default function ClientPanel() {
 
       const config: StoredConfig = {
         linkCode: code,
-        adminName: admin,
+        // adminName: admin,
         connectedAt: new Date().toISOString(),
         instanceMetadata: metadata || undefined
       };
@@ -202,7 +202,7 @@ export default function ClientPanel() {
       }
 
       setLinkCode(code);
-      setAdminName(admin);
+      // setAdminName(admin);
       setScreen('support');
     } catch (error: any) {
       console.error('Error in handleConnected:', error);
@@ -210,7 +210,7 @@ export default function ClientPanel() {
       setLoadingError(`שגיאה בחיבור: ${errorMessage}`);
       // גם אם השמירה נכשלה, נמשיך עם החיבור
       setLinkCode(code);
-      setAdminName(admin);
+      // setAdminName(admin);
       setScreen('support');
     }
   };
@@ -224,7 +224,7 @@ export default function ClientPanel() {
     }
 
     setLinkCode(null);
-    setAdminName(null);
+    // setAdminName(null);
     setScreen('setup');
   };
 
@@ -281,7 +281,7 @@ export default function ClientPanel() {
       ) : (
         <SupportScreen
           linkCode={linkCode!}
-          adminName={adminName || undefined}
+          // adminName={adminName || undefined}
           onDisconnect={handleDisconnect}
           instanceMetadata={instanceMetadata || undefined}
           currentUserMetadata={currentUserMetadata || undefined}
