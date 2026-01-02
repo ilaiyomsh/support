@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+
+# Documentation and specs (local only)
+SPEC/
+
+# Local storage files with sensitive data
+local-secure-storage.db.json
+*.db.json
+
+# Build outputs in public directory (generated files)
+public/admin/*.js
+public/admin/*.js.map
+public/admin/*.css
+public/client/*.js
+public/client/*.js.map
+public/client/*.css
+public/tokens/*.js
+public/tokens/*.js.map
+public/tokens/*.css
+
+# Keep essential files in public
+!public/**/index.html
+!public/**/*.html
+!public/client/db.js
+!public/client/RecordRTC.js
+!public/client/agent.html
+
+# Build artifacts in public/src
+public/src/
+
+# Temporary files
+public/temp/*
+!public/temp/.gitkeep

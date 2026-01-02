@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>הקלטה פעילה</title>
+    <script src="RecordRTC.js"></script>
+    <script src="db.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        /* Main Container */
+        #main-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* PiP Mode Specifics */
+        body.pip-mode {
+            background: #2d3748;
+            padding: 0;
+            margin: 0;
+        }
+
+        body.pip-mode #main-container {
+            padding: 12px;
+        }
+
+        body.pip-mode .btn {
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        /* Placeholder in Launcher */
+        .launcher-placeholder {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        /* --- UI Elements --- */
+        .status-text {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .timer {
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Recording Dot */
+        .rec-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            background: rgba(255, 0, 0, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .rec-dot {
+            width: 10px;
+            height: 10px;
+            background: #f56565;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .rec-label {
+            color: #f56565;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3182ce;
+        }
+
+        .btn-stop {
+            background: #e53e3e;
+            color: white;
+            max-width: 200px;
+            width: auto;
+        }
+
+        .btn-stop:hover {
+            background: #c53030;
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #cbd5e0;
+            flex: 1;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Preview Specifics */
+        .video-wrapper {
+            width: 100%;
+            flex: 1;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            min-height: 150px;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .description-field {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .description-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e0;
+        }
+
+        .description-field textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .description-field textarea:focus {
+            outline: none;
+            border-color: #63b3ed;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .description-field textarea::placeholder {
+            color: #a0aec0;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #63b3ed;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main-container">
+        <!-- 1. Permission Screen -->
+        <div id="screen-permission" class="screen active">
+            <div class="spinner"></div>
+            <div class="title">ממתין לאישור...</div>
+            <div class="subtitle">
+                אנא בחר את המסך או החלון להקלטה.<br>
+                <span style="color: #63b3ed; font-weight: bold;">בדוק אם חלון הבחירה מסתתר מאחור!</span>
+            </div>
+        </div>
+
+        <!-- 2. Recording Screen (Will move to PiP) -->
+        <div id="screen-recording" class="screen">
+            <div class="rec-indicator">
+                <div class="rec-dot"></div>
+                <span class="rec-label">מקליט</span>
+            </div>
+            <div class="timer" id="timer">00:00</div>
+            <button class="btn btn-stop" id="stop-btn">
+                ⏹ עצור הקלטה
+            </button>
+        </div>
+
+        <!-- 3. Placeholder - shown when PiP is active -->
+        <div id="screen-placeholder" class="screen">
+            <div style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">↗️</div>
+            <div class="title">השליטה בחלון הצף</div>
+            <p style="color: #a0aec0; margin-bottom: 16px;">אל תסגור חלון זה עד לסיום התהליך.</p>
+            <div style="font-size: 13px; color: #718096; text-align: center; line-height: 1.6;">
+                ניתן לגרור את חלון השליטה או לשנות את גודלו<br>
+                עצור את ההקלטה כדי להמשיך
+            </div>
+        </div>
+
+        <!-- 4. Preview Screen -->
+        <div id="screen-preview" class="screen">
+            <div class="video-wrapper">
+                <video id="preview-video" controls playsinline></video>
+            </div>
+            
+            <div class="description-field">
+                <label for="description-input">תיאור הבעיה (אופציונלי)</label>
+                <textarea 
+                    id="description-input" 
+                    placeholder="תאר את הבעיה שנתקלת בה, השלבים לשחזור, וכל מידע רלוונטי אחר..."
+                ></textarea>
+            </div>
+
+            <div style="width: 100%; text-align: center; margin-bottom: 16px;">
+                <p class="subtitle">האם לשלוח את ההקלטה?</p>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn btn-ghost" id="discard-btn">מחק</button>
+                <button class="btn btn-success" id="submit-btn">שלח וסיים</button>
+            </div>
+        </div>
+
+        <!-- 5. Processing Screen -->
+        <div id="screen-processing" class="screen">
+            <div class="spinner"></div>
+            <div class="title" id="proc-title">שולח...</div>
+            <div class="subtitle" id="proc-subtitle">אנא המתן</div>
+        </div>
+    </div>
+
+    <!-- Placeholder for Launcher Window -->
+    <div id="launcher-placeholder" class="launcher-placeholder">
+        <div style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">↗️</div>
+        <div class="title">השליטה בחלון הצף</div>
+        <p>אל תסגור חלון זה עד לסיום התהליך.</p>
+    </div>
+
+    <script>
+        // --- Setup ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('sessionId') || 'mock-session-' + Date.now();
+
+        console.log('[Agent] Using sessionId:', sessionId);
+
+        const screens = {
+            permission: document.getElementById('screen-permission'),
+            recording: document.getElementById('screen-recording'),
+            placeholder: document.getElementById('screen-placeholder'),
+            preview: document.getElementById('screen-preview'),
+            processing: document.getElementById('screen-processing')
+        };
+
+        const els = {
+            main: document.getElementById('main-container'),
+            launcher: document.getElementById('launcher-placeholder'),
+            timer: null, // Will be set dynamically
+            procTitle: document.getElementById('proc-title'),
+            procSub: document.getElementById('proc-subtitle'),
+            previewVideo: document.getElementById('preview-video'),
+            descriptionInput: document.getElementById('description-input')
+        };
+
+        let recorder;
+        let combinedStream;
+        let startTime;
+        let timerInterval;
+        let currentBlob = null;
+        let pipWindow = null;
+        let isActionTaken = false;
+
+        function switchScreen(name) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            if (screens[name]) {
+                screens[name].classList.add('active');
+            }
+        }
+
+        // --- Step 1: Capture ---
+        async function startCapture() {
+            let micStream = null;
+            try {
+                switchScreen('permission');
+                try {
+                    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                } catch (micError) {
+                    console.warn('[Agent] Microphone permission denied, continuing without mic');
+                }
+
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: {
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 24, max: 30 }
+                    },
+                    audio: true
+                });
+
+                // Combine streams
+                combinedStream = new MediaStream();
+                screenStream.getVideoTracks().forEach(track => {
+                    combinedStream.addTrack(track);
+                    track.onended = () => stopRecording();
+                });
+                screenStream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+                if (micStream) {
+                    micStream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+                }
+
+                // Setup recorder
+                let mimeType = 'video/webm';
+                if (MediaRecorder.isTypeSupported('video/mp4')) {
+                    mimeType = 'video/mp4';
+                } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+                    mimeType = 'video/webm;codecs=vp9';
+                } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+                    mimeType = 'video/webm;codecs=vp8';
+                }
+
+                recorder = new RecordRTC(combinedStream, {
+                    type: 'video',
+                    mimeType: mimeType,
+                    videoBitsPerSecond: 1500000,
+                    disableLogs: true,
+                    getNativeBlob: false,
+                    canvas: {
+                        width: 1280,
+                        height: 720
+                    }
+                });
+
+                recorder.startRecording();
+                startTime = Date.now();
+                timerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                    const secs = String(elapsed % 60).padStart(2, '0');
+                    els.timer.textContent = `${mins}:${secs}`;
+                }, 1000);
+
+                // Open PiP with recording controls
+                openPiPWithControls();
+                console.log('[Agent] Recording started');
+
+            } catch (err) {
+                console.error('[Agent] Error starting capture:', err);
+                els.procTitle.textContent = "שגיאה: " + err.message;
+                isActionTaken = true;
+                if (sessionId) {
+                    fetch(`/api/sessions/${sessionId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'error' })
+                    }).catch(() => {});
+                }
+                setTimeout(() => {
+                    console.log('[Agent] Closing due to error');
+                    window.close();
+                }, 2000);
+            }
+        }
+
+        // --- Step 2: Open PiP with recording controls ---
+        async function openPiPWithControls() {
+            if (!('documentPictureInPicture' in window)) {
+                // Fallback: recording stays in current window
+                console.log('[Agent] PiP not supported, using fallback');
+                switchScreen('recording');
+                return;
+            }
+
+            try {
+                // Request PiP window
+                pipWindow = await documentPictureInPicture.requestWindow({
+                    width: 300,
+                    height: 200
+                });
+
+                console.log('[Agent] PiP window opened');
+
+                // Create wrapper for PiP content
+                const pipContainer = document.createElement('div');
+                pipContainer.id = 'pip-container';
+                pipContainer.style.width = '100%';
+                pipContainer.style.height = '100%';
+                pipContainer.style.display = 'flex';
+                pipContainer.style.flexDirection = 'column';
+                pipContainer.style.alignItems = 'center';
+                pipContainer.style.justifyContent = 'center';
+                
+                // Clone recording screen to PiP
+                const recordingClone = screens.recording.cloneNode(true);
+                recordingClone.classList.add('active');
+                pipContainer.appendChild(recordingClone);
+
+                // Update references to elements in PiP
+                els.timer = recordingClone.querySelector('#timer');
+
+                // Copy styles
+                [...document.styleSheets].forEach(sheet => {
+                    try {
+                        const css = [...sheet.cssRules].map(r => r.cssText).join('');
+                        const style = document.createElement('style');
+                        style.textContent = css;
+                        pipWindow.document.head.appendChild(style);
+                    } catch (e) { /* CORS issues ignored */ }
+                });
+
+                // Add pip-mode class and append content
+                pipWindow.document.body.classList.add('pip-mode');
+                pipWindow.document.body.appendChild(pipContainer);
+
+                // Update stop button reference for PiP version
+                const pipStopBtn = recordingClone.querySelector('#stop-btn');
+                if (pipStopBtn) {
+                    pipStopBtn.onclick = stopRecording;
+                }
+
+                console.log('[Agent] Timer element in PiP:', els.timer);
+
+                // Show placeholder in main window
+                switchScreen('placeholder');
+
+                // Handle PiP close
+                pipWindow.addEventListener('pagehide', () => {
+                    if (!isActionTaken && recorder && recorder.state === 'recording') {
+                        console.log('[Agent] PiP closed, stopping recording');
+                        stopRecording();
+                    }
+                });
+
+            } catch (err) {
+                console.error('[Agent] PiP failed:', err);
+                // Fallback to recording in main window
+                switchScreen('recording');
+            }
+        }
+
+        // --- Step 3: Stop Recording ---
+        function stopRecording() {
+            if (!recorder) return;
+
+            clearInterval(timerInterval);
+            switchScreen('processing');
+            els.procTitle.textContent = "מכין תצוגה מקדימה...";
+            els.procSub.textContent = "אנא המתן";
+
+            recorder.stopRecording(() => {
+                currentBlob = recorder.getBlob();
+                console.log('[Agent] Recording stopped, type:', currentBlob.type);
+
+                // Cleanup streams
+                if (combinedStream) {
+                    combinedStream.getTracks().forEach(t => t.stop());
+                }
+
+                // Close PiP
+                if (pipWindow) {
+                    pipWindow.close();
+                    pipWindow = null;
+                }
+
+                // Bring window to front and focus
+                try { window.focus(); } catch (e) { }
+                try { window.raise?.(); } catch (e) { }
+
+                // Resize window for preview
+                try { window.resizeTo(900, 700); } catch (e) { }
+                try {
+                    const left = (screen.width - 900) / 2;
+                    const top = (screen.height - 700) / 2;
+                    window.moveTo(left, top);
+                } catch (e) { }
+
+                // Show preview
+                els.previewVideo.src = URL.createObjectURL(currentBlob);
+                switchScreen('preview');
+            });
+        }
+
+        // --- Step 4: Submit Recording ---
+        async function submitTicket() {
+            isActionTaken = true;
+            switchScreen('processing');
+            els.procTitle.textContent = "שולח הקלטה...";
+            els.procSub.textContent = "אנא המתן";
+
+            try {
+                const formData = new FormData();
+                const ext = currentBlob.type.includes('mp4') ? 'mp4' : 'webm';
+                formData.append('file', currentBlob, `recording.${ext}`);
+                formData.append('description', els.descriptionInput.value);
+
+                const response = await fetch(`/api/sessions/${sessionId}/submit`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.message || 'Upload failed');
+                }
+
+                els.procTitle.textContent = "הפנייה נשלחה בהצלחה!";
+                els.procSub.textContent = "תודה, חלון זה ייסגר כעת";
+
+                setTimeout(() => {
+                    console.log('[Agent] Closing window');
+                    window.close();
+                }, 2000);
+
+            } catch (err) {
+                console.error('[Agent] Error submitting:', err);
+                els.procTitle.textContent = "שגיאה בשליחה";
+                els.procSub.textContent = err.message;
+
+                if (sessionId) {
+                    fetch(`/api/sessions/${sessionId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'error' })
+                    }).catch(() => {});
+                }
+            }
+        }
+
+        // --- Step 5: Discard Recording ---
+        function discardRecording() {
+            if (confirm("האם למחוק את ההקלטה?")) {
+                isActionTaken = true;
+                if (sessionId) {
+                    fetch(`/api/sessions/${sessionId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'cancelled' })
+                    }).catch(() => {});
+                }
+                if (currentBlob) {
+                    URL.revokeObjectURL(els.previewVideo.src);
+                }
+                window.close();
+            }
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('stop-btn').onclick = stopRecording;
+        document.getElementById('submit-btn').onclick = submitTicket;
+        document.getElementById('discard-btn').onclick = discardRecording;
+
+        // Start recording immediately
+        window.addEventListener('load', startCapture);
+
+        // Cleanup
+        window.addEventListener('beforeunload', () => {
+            if (!isActionTaken && sessionId) {
+                const blob = new Blob([JSON.stringify({status: 'cancelled'})], {type: 'application/json'});
+                navigator.sendBeacon(`/api/sessions/${sessionId}/status`, blob);
+            }
+        });
+    </script>
+</body>
+
+</html>
