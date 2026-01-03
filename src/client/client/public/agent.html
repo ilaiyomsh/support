@@ -344,13 +344,10 @@
 
         <!-- 3. Placeholder - shown when PiP is active -->
         <div id="screen-placeholder" class="screen">
-            <div style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">↗️</div>
+            <div style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;"></div>
             <div class="title">השליטה בחלון הצף</div>
             <p style="color: var(--color-text-secondary); margin-bottom: 16px;">אל תסגור חלון זה עד לסיום התהליך.</p>
-            <div style="font-size: 13px; color: var(--color-text-secondary); text-align: center; line-height: 1.6;">
-                ניתן לגרור את חלון השליטה או לשנות את גודלו<br>
-                עצור את ההקלטה כדי להמשיך
-            </div>
+            
         </div>
 
         <!-- 4. Preview Screen -->
@@ -479,15 +476,22 @@
 
                 recorder.startRecording();
                 startTime = Date.now();
-                timerInterval = setInterval(() => {
-                    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                    const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
-                    const secs = String(elapsed % 60).padStart(2, '0');
-                    els.timer.textContent = `${mins}:${secs}`;
-                }, 1000);
-
-                // Open PiP with recording controls
+                
+                // Open PiP with recording controls FIRST
                 openPiPWithControls();
+                
+                // Start timer AFTER PiP is ready (els.timer will be set in openPiPWithControls)
+                setTimeout(() => {
+                    timerInterval = setInterval(() => {
+                        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                        const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                        const secs = String(elapsed % 60).padStart(2, '0');
+                        if (els.timer) {
+                            els.timer.textContent = `${mins}:${secs}`;
+                        }
+                    }, 1000);
+                }, 300); // Wait for PiP setup
+                
                 console.log('[Agent] Recording started');
 
             } catch (err) {
