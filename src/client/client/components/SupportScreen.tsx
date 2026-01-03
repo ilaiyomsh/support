@@ -320,8 +320,6 @@ export default function SupportScreen({
             <div>
               <p className="support-description">
                 {formConfig?.description || null }
-                // End of Selection
-```
               </p>
             </div>
           </div>

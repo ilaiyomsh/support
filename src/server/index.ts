@@ -62,7 +62,7 @@ app.get('/admin', (_req, res) => {
 });
 
 // SPA fallback for Admin App - handle all other routes
-app.get('/admin/*', (_req, res) => {
+app.get('/admin/*splat', (_req, res) => {
   res.sendFile(path.join(__dirname, '../../public/admin/index.html'));
 });
 
@@ -131,7 +131,7 @@ app.get('/client', (_req, res) => {
 });
 
 // SPA fallback for Client App - handle all other routes (but not the static files above)
-app.get('/client/*', (req, res) => {
+app.get('/client/*splat', (req, res) => {
   const staticFiles = ['/client/recorder.html', '/client/agent.html', '/client/db.js', '/client/RecordRTC.js'];
   if (staticFiles.includes(req.path)) {
     return res.sendFile(path.join(__dirname, `../../public${req.path}`));
@@ -146,7 +146,7 @@ app.get('/', (_req, res) => {
     endpoints: {
       admin: '/admin',
       client: '/client',
-      api: '/api/*',
+      api: '/api/(.*)',
       health: '/health'
     }
   });

@@ -64,8 +64,8 @@ export default function RecordingPanel({ ticketData }: RecordingPanelProps) {
             console.log('[RecordingPanel] Session created:', sessionId, 'with ticket data');
 
             // Open agent window with sessionId
-            const width = 500;
-            const height = 450;
+            const width = 600;
+            const height = 500;
             const left = window.screen.width - width - 20;
             const top = 50;
 

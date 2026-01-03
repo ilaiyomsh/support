@@ -434,9 +434,9 @@
 
                 const screenStream = await navigator.mediaDevices.getDisplayMedia({
                     video: {
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 720, max: 1080 },
-                        frameRate: { ideal: 24, max: 30 }
+                        width: { ideal: 1920, max: 1920 },
+                        height: { ideal: 1080, max: 1080 },
+                        frameRate: { ideal: 30, max: 30 }
                     },
                     audio: true
                 });
@@ -465,7 +465,7 @@
                 recorder = new RecordRTC(combinedStream, {
                     type: 'video',
                     mimeType: mimeType,
-                    videoBitsPerSecond: 1500000,
+                    videoBitsPerSecond: 2500000,
                     disableLogs: true,
                     getNativeBlob: false,
                     canvas: {
@@ -574,7 +574,7 @@
                         console.log('[Agent] Shrinking main window...');
 
                         // --- פעולה 1: שינוי גודל מיידי ל-90x90 ---
-                        window.resizeTo(MINI_SIZE, MINI_SIZE);
+                        window.resizeTo(220, 200);
                         
                         // --- פעולה 2: הזזה למקום בטוח ---
                         // חישוב מיקום: פינה ימנית תחתונה, אבל עם רווח גדול מהקצוות
@@ -612,7 +612,7 @@
                     } catch (e) {
                         console.warn('[Agent] Could not shrink main window:', e);
                     }
-                }, 100); 
+                }, 250); 
 
                 // האזנה לסגירה
                 pipWindow.addEventListener('pagehide', () => {
