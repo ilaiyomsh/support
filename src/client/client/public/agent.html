@@ -385,13 +385,6 @@
         </div>
     </div>
 
-    <!-- Placeholder for Launcher Window -->
-    <div id="launcher-placeholder" class="launcher-placeholder">
-        <div style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">↗️</div>
-        <div class="title">השליטה בחלון הצף</div>
-        <p>אל תסגור חלון זה עד לסיום התהליך.</p>
-    </div>
-
     <script>
         // --- Setup ---
         const urlParams = new URLSearchParams(window.location.search);
@@ -409,7 +402,6 @@
 
         const els = {
             main: document.getElementById('main-container'),
-            launcher: document.getElementById('launcher-placeholder'),
             timer: null, // Will be set dynamically
             procTitle: document.getElementById('proc-title'),
             procSub: document.getElementById('proc-subtitle'),
