@@ -7,16 +7,38 @@
     <script src="RecordRTC.js"></script>
     <script src="db.js"></script>
     <style>
+        /* --- CSS Variables - Design System --- */
+        @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --color-primary: #0073ea;
+            --color-primary-hover: #0060b9;
+            --color-text-primary: #323338;
+            --color-text-secondary: #676879;
+            --color-background: #f5f7fa;
+            --color-white: #ffffff;
+            --color-border: #d0d4e4;
+            --color-red-500: #ef4444;
+            --color-red-600: #dc2626;
+            --color-green-500: #10b981;
+            --color-green-600: #059669;
+            --color-gray-50: #f9fafb;
+            --color-gray-100: #f3f4f6;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* --- Base Layout (Main Window - Light Theme) --- */
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-background);
+            color: var(--color-text-primary);
+            font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -26,7 +48,6 @@
             overflow: hidden;
         }
 
-        /* Main Container */
         #main-container {
             width: 100%;
             height: 100%;
@@ -36,9 +57,9 @@
             justify-content: center;
         }
 
-        /* PiP Mode Specifics */
+        /* --- PiP Mode Specifics --- */
         body.pip-mode {
-            background: #2d3748;
+            background: var(--color-background);
             padding: 0;
             margin: 0;
         }
@@ -52,21 +73,10 @@
             font-size: 14px;
         }
 
-        /* Placeholder in Launcher */
-        .launcher-placeholder {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #718096;
-            font-size: 14px;
-        }
-
         /* --- UI Elements --- */
         .status-text {
             font-size: 14px;
-            color: #aaa;
+            color: var(--color-text-secondary);
             margin-bottom: 10px;
             text-align: center;
         }
@@ -75,11 +85,12 @@
             font-size: 20px;
             font-weight: 600;
             margin-bottom: 8px;
+            color: var(--color-text-primary);
         }
 
         .subtitle {
             font-size: 14px;
-            color: #a0aec0;
+            color: var(--color-text-secondary);
             margin-bottom: 24px;
             line-height: 1.5;
         }
@@ -90,7 +101,7 @@
             margin-bottom: 20px;
             font-variant-numeric: tabular-nums;
             letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: var(--color-text-primary);
         }
 
         /* Recording Dot */
@@ -99,7 +110,7 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 15px;
-            background: rgba(255, 0, 0, 0.1);
+            background: rgba(239, 68, 68, 0.05);
             padding: 4px 12px;
             border-radius: 20px;
         }
@@ -107,13 +118,13 @@
         .rec-dot {
             width: 10px;
             height: 10px;
-            background: #f56565;
+            background: var(--color-red-500);
             border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
 
         .rec-label {
-            color: #f56565;
+            color: var(--color-red-600);
             font-size: 12px;
             font-weight: bold;
         }
@@ -132,7 +143,7 @@
         /* Buttons */
         .btn {
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
@@ -141,10 +152,11 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             width: 100%;
             padding: 14px;
             margin-bottom: 12px;
+            height: 40px;
         }
 
         .btn:active {
@@ -152,44 +164,44 @@
         }
 
         .btn-primary {
-            background: #4299e1;
+            background: var(--color-primary);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #3182ce;
+            background: var(--color-primary-hover);
         }
 
         .btn-stop {
-            background: #e53e3e;
+            background: var(--color-red-600);
             color: white;
             max-width: 200px;
             width: auto;
         }
 
         .btn-stop:hover {
-            background: #c53030;
+            background: #b91c1c;
         }
 
         .btn-success {
-            background: #38a169;
+            background: var(--color-green-500);
             color: white;
         }
 
         .btn-success:hover {
-            background: #2f855a;
+            background: var(--color-green-600);
         }
 
         .btn-ghost {
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #cbd5e0;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
             flex: 1;
         }
 
         .btn-ghost:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: rgba(208, 212, 228, 0.3);
+            color: var(--color-text-primary);
         }
 
         /* Screens */
@@ -222,13 +234,13 @@
             width: 100%;
             flex: 1;
             background: #000;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
             margin-bottom: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             min-height: 150px;
         }
 
@@ -248,30 +260,31 @@
             margin-bottom: 8px;
             font-size: 14px;
             font-weight: 600;
-            color: #cbd5e0;
+            color: var(--color-text-primary);
         }
 
         .description-field textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            color: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            background: var(--color-white);
+            color: var(--color-text-primary);
             font-family: inherit;
             font-size: 14px;
             resize: vertical;
             min-height: 100px;
+            transition: all 0.2s;
         }
 
         .description-field textarea:focus {
             outline: none;
-            border-color: #63b3ed;
-            background: rgba(0, 0, 0, 0.5);
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 1px var(--color-primary);
         }
 
         .description-field textarea::placeholder {
-            color: #a0aec0;
+            color: #9ca3af;
         }
 
         .actions-row {
@@ -282,12 +295,12 @@
 
         /* Spinner */
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #63b3ed;
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--color-gray-100);
+            border-top: 4px solid var(--color-primary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
             margin-bottom: 16px;
         }
 
@@ -295,6 +308,12 @@
             to {
                 transform: rotate(360deg);
             }
+        }
+
+        /* Placeholder */
+        #screen-placeholder {
+            background: var(--color-background);
+            color: var(--color-text-secondary);
         }
     </style>
 </head>
@@ -307,7 +326,7 @@
             <div class="title">ממתין לאישור...</div>
             <div class="subtitle">
                 אנא בחר את המסך או החלון להקלטה.<br>
-                <span style="color: #63b3ed; font-weight: bold;">בדוק אם חלון הבחירה מסתתר מאחור!</span>
+                <span style="color: var(--color-primary); font-weight: bold;">בדוק אם חלון הבחירה מסתתר מאחור!</span>
             </div>
         </div>
 
@@ -327,8 +346,8 @@
         <div id="screen-placeholder" class="screen">
             <div style="font-size: 32px; margin-bottom: 16px; opacity: 0.5;">↗️</div>
             <div class="title">השליטה בחלון הצף</div>
-            <p style="color: #a0aec0; margin-bottom: 16px;">אל תסגור חלון זה עד לסיום התהליך.</p>
-            <div style="font-size: 13px; color: #718096; text-align: center; line-height: 1.6;">
+            <p style="color: var(--color-text-secondary); margin-bottom: 16px;">אל תסגור חלון זה עד לסיום התהליך.</p>
+            <div style="font-size: 13px; color: var(--color-text-secondary); text-align: center; line-height: 1.6;">
                 ניתן לגרור את חלון השליטה או לשנות את גודלו<br>
                 עצור את ההקלטה כדי להמשיך
             </div>
@@ -496,26 +515,30 @@
                 }, 2000);
             }
         }
-
-        // --- Step 2: Open PiP with recording controls ---
-        async function openPiPWithControls() {
+        
+     // --- Step 2: Open PiP with recording controls ---
+     async function openPiPWithControls() {
             if (!('documentPictureInPicture' in window)) {
-                // Fallback: recording stays in current window
                 console.log('[Agent] PiP not supported, using fallback');
                 switchScreen('recording');
                 return;
             }
 
             try {
-                // Request PiP window
+                // הגדרות גודל
+                const PIP_WIDTH = 280;
+                const PIP_HEIGHT = 200;
+                const MINI_SIZE = 90; // גודל 90x90 כפי שביקשת
+
+                // 1. פתיחת חלון ה-PiP
                 pipWindow = await documentPictureInPicture.requestWindow({
-                    width: 300,
-                    height: 200
+                    width: PIP_WIDTH,
+                    height: PIP_HEIGHT
                 });
 
                 console.log('[Agent] PiP window opened');
 
-                // Create wrapper for PiP content
+                // 2. בניית תוכן ה-PiP
                 const pipContainer = document.createElement('div');
                 pipContainer.id = 'pip-container';
                 pipContainer.style.width = '100%';
@@ -525,54 +548,94 @@
                 pipContainer.style.alignItems = 'center';
                 pipContainer.style.justifyContent = 'center';
                 
-                // Clone recording screen to PiP
                 const recordingClone = screens.recording.cloneNode(true);
                 recordingClone.classList.add('active');
                 pipContainer.appendChild(recordingClone);
 
-                // Update references to elements in PiP
                 els.timer = recordingClone.querySelector('#timer');
 
-                // Copy styles
+                // העתקת CSS
                 [...document.styleSheets].forEach(sheet => {
                     try {
                         const css = [...sheet.cssRules].map(r => r.cssText).join('');
                         const style = document.createElement('style');
                         style.textContent = css;
                         pipWindow.document.head.appendChild(style);
-                    } catch (e) { /* CORS issues ignored */ }
+                    } catch (e) { }
                 });
 
-                // Add pip-mode class and append content
                 pipWindow.document.body.classList.add('pip-mode');
                 pipWindow.document.body.appendChild(pipContainer);
 
-                // Update stop button reference for PiP version
                 const pipStopBtn = recordingClone.querySelector('#stop-btn');
                 if (pipStopBtn) {
                     pipStopBtn.onclick = stopRecording;
                 }
 
-                console.log('[Agent] Timer element in PiP:', els.timer);
+                // 3. לוגיקת כיווץ והסתרה
+                setTimeout(() => {
+                    try {
+                        console.log('[Agent] Shrinking main window...');
 
-                // Show placeholder in main window
-                switchScreen('placeholder');
+                        // --- פעולה 1: שינוי גודל מיידי ל-90x90 ---
+                        window.resizeTo(MINI_SIZE, MINI_SIZE);
+                        
+                        // --- פעולה 2: הזזה למקום בטוח ---
+                        // הגדלנו את השוליים ל-200 כדי למנוע את ה"גרירה" של מערכת ההפעלה מהקצה
+                        const SAFE_MARGIN = 200; 
 
-                // Handle PiP close
+                        // חישוב מיקום: פינה ימנית תחתונה, אבל עם רווח גדול מהקצוות
+                        const newLeft = window.screen.availWidth - MINI_SIZE - 170;
+                        const newTop = window.screen.availHeight - MINI_SIZE - 120;
+
+                        window.moveTo(newLeft, newTop);
+
+                        // --- פעולה 3: שינוי עיצוב והחלפת מסך (Placeholder) ---
+                        // מתבצע רק אחרי שהחלון כבר קטן ובמקום הנכון
+                        document.body.style.background = 'var(--color-background)'; 
+
+                        const placeholderScreen = document.getElementById('screen-placeholder');
+                        if (placeholderScreen) {
+                            placeholderScreen.innerHTML = `
+                                <div style="
+                                    display: flex; 
+                                    justify-content: center; 
+                                    align-items: center; 
+                                    height: 100%; 
+                                    background: var(--color-background);
+                                    color: var(--color-text-secondary);
+                                    font-size: 24px;
+                                ">
+                                    👁️
+                                </div>
+                            `;
+                        }
+
+                        switchScreen('placeholder');
+
+                        // --- פעולה 4: הסרת פוקוס ---
+                        window.blur();
+                        if (pipWindow) pipWindow.focus();
+
+                    } catch (e) {
+                        console.warn('[Agent] Could not shrink main window:', e);
+                    }
+                }, 200); 
+
+                // האזנה לסגירה
                 pipWindow.addEventListener('pagehide', () => {
                     if (!isActionTaken && recorder && recorder.state === 'recording') {
-                        console.log('[Agent] PiP closed, stopping recording');
                         stopRecording();
                     }
                 });
 
             } catch (err) {
                 console.error('[Agent] PiP failed:', err);
-                // Fallback to recording in main window
                 switchScreen('recording');
+                try { window.resizeTo(900, 700); } catch(e){}
             }
         }
-
+       
         // --- Step 3: Stop Recording ---
         function stopRecording() {
             if (!recorder) return;
