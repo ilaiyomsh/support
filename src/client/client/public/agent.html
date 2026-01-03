@@ -568,55 +568,49 @@
                     pipStopBtn.onclick = stopRecording;
                 }
 
-                // 3. לוגיקת כיווץ והסתרה
-                setTimeout(() => {
-                    try {
-                        console.log('[Agent] Shrinking main window...');
+                // 3. לוגיקת כיווץ והסתרה - מיידית
+                try {
+                    console.log('[Agent] Shrinking main window...');
 
-                        // --- פעולה 1: שינוי גודל מיידי ל-90x90 ---
-                        window.resizeTo(MINI_SIZE, MINI_SIZE);
-                        
-                        // --- פעולה 2: הזזה למקום בטוח ---
-                        // הגדלנו את השוליים ל-200 כדי למנוע את ה"גרירה" של מערכת ההפעלה מהקצה
-                        const SAFE_MARGIN = 200; 
+                    // --- פעולה 1: שינוי גודל מיידי ל-90x90 ---
+                    window.resizeTo(MINI_SIZE, MINI_SIZE);
+                    
+                    // --- פעולה 2: הזזה למקום בטוח ---
+                    // חישוב מיקום: פינה ימנית תחתונה, אבל עם רווח גדול מהקצוות
+                    const newLeft = window.screen.availWidth - MINI_SIZE - 170;
+                    const newTop = window.screen.availHeight - MINI_SIZE - 120;
 
-                        // חישוב מיקום: פינה ימנית תחתונה, אבל עם רווח גדול מהקצוות
-                        const newLeft = window.screen.availWidth - MINI_SIZE - 170;
-                        const newTop = window.screen.availHeight - MINI_SIZE - 120;
+                    window.moveTo(newLeft, newTop);
 
-                        window.moveTo(newLeft, newTop);
+                    // --- פעולה 3: שינוי עיצוב והחלפת מסך (Placeholder) ---
+                    document.body.style.background = 'var(--color-background)'; 
 
-                        // --- פעולה 3: שינוי עיצוב והחלפת מסך (Placeholder) ---
-                        // מתבצע רק אחרי שהחלון כבר קטן ובמקום הנכון
-                        document.body.style.background = 'var(--color-background)'; 
-
-                        const placeholderScreen = document.getElementById('screen-placeholder');
-                        if (placeholderScreen) {
-                            placeholderScreen.innerHTML = `
-                                <div style="
-                                    display: flex; 
-                                    justify-content: center; 
-                                    align-items: center; 
-                                    height: 100%; 
-                                    background: var(--color-background);
-                                    color: var(--color-text-secondary);
-                                    font-size: 24px;
-                                ">
-                                    👁️
-                                </div>
-                            `;
-                        }
-
-                        switchScreen('placeholder');
-
-                        // --- פעולה 4: הסרת פוקוס ---
-                        window.blur();
-                        if (pipWindow) pipWindow.focus();
-
-                    } catch (e) {
-                        console.warn('[Agent] Could not shrink main window:', e);
+                    const placeholderScreen = document.getElementById('screen-placeholder');
+                    if (placeholderScreen) {
+                        placeholderScreen.innerHTML = `
+                            <div style="
+                                display: flex; 
+                                justify-content: center; 
+                                align-items: center; 
+                                height: 100%; 
+                                background: var(--color-background);
+                                color: var(--color-text-secondary);
+                                font-size: 24px;
+                            ">
+                                👁️
+                            </div>
+                        `;
                     }
-                }, 200); 
+
+                    switchScreen('placeholder');
+
+                    // --- פעולה 4: הסרת פוקוס ---
+                    window.blur();
+                    if (pipWindow) pipWindow.focus();
+
+                } catch (e) {
+                    console.warn('[Agent] Could not shrink main window:', e);
+                } 
 
                 // האזנה לסגירה
                 pipWindow.addEventListener('pagehide', () => {
